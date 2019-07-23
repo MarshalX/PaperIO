@@ -20,7 +20,14 @@ class Player:
         self.score = score
         self.direction = direction
 
-        self.way_queue = []
+    def __eq__(self, other):
+        if not isinstance(other, Player):
+            return NotImplemented
+
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash(self.id)
 
     def __repr__(self):
         return f'[Player] ID:{self.id}; Score:{self.score}'
@@ -46,12 +53,7 @@ class Player:
         if command == RIGHT and self.direction != LEFT:
             self.direction = RIGHT
 
-    def move(self, cell=None):
-        if cell is None and len(self.way_queue):
-            cell = self.way_queue.pop(0)
-        else:
-            return
-
+    def move(self, cell):
         x, y = cell.x, cell.y
 
         command = None

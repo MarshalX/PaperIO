@@ -3,20 +3,23 @@ from enum import Enum
 
 class Entities(Enum):
     PLAYER = 'p',
+    MY_PLAYER = 'mp',
     LINE = 'l',
-    CAPTURED = 'c'
+    MY_LINE = ',l',
+    CAPTURE = 'c'
+    MY_CAPTURE = 'mc'
     EMPTY = 'e',
     BONUS = 'b'
 
 
 class Cell:
-    def __init__(self, x, y, entity=Entities.EMPTY, data=None):
+    def __init__(self, x, y, type=Entities.EMPTY, entity=None):
         self.x, self.y = x, y
         self.entity = entity
-        self.data = data
+        self.type = type
 
     def __repr__(self):
-        return f'[Cell] X:{self.x}; Y: {self.y}; Entity: {self.entity}'
+        return f'[Cell] X:{self.x}; Y: {self.y}; Type: {self.type}'
 
     def __eq__(self, other):
         if not isinstance(other, Cell):

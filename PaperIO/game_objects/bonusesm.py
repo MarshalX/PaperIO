@@ -1,4 +1,3 @@
-from helpersm import get_random_coordinates, msg
 from constantsm import WIDTH
 
 
@@ -10,20 +9,6 @@ class Bonus:
         x, y = int(position[0] / WIDTH), int(position[1] / WIDTH)
         self.x = x
         self.y = y
-
-    @staticmethod
-    def is_available_point(x, y, players, busy_points):
-        for p in players:
-            if (p.x - 2 * WIDTH <= x <= p.x + 2 * WIDTH) and (p.y - 2 * WIDTH <= y <= p.y + 2 * WIDTH):
-                return False
-        return (x, y) not in busy_points
-
-    @staticmethod
-    def generate_coordinates(players, busy_points):
-        x, y = get_random_coordinates()
-        while not Bonus.is_available_point(x, y, players, busy_points):
-            x, y = get_random_coordinates()
-        return x, y
 
     def is_ate(self, player, captured):
         return (self.x, self.y) == (player.x, player.y) or (self.x, self.y) in captured

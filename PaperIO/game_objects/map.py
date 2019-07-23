@@ -1,6 +1,6 @@
 from game_objects.cell import Cell, Entities
 from constantsm import Y_CELLS_COUNT, X_CELLS_COUNT
-from helpersm import get_vert_and_horiz, msg
+from helpersm import msg
 
 
 class Map:
@@ -13,38 +13,70 @@ class Map:
                 self.map.append([Cell(i, j) for j in range(X_CELLS_COUNT)])
 
         for player in players:
+            me = player.id == 'i'
+
+            x, y = player.x, player.y
+            cell = self[x][y]
+            cell.type = Entities.MY_PLAYER if me else Entities.PLAYER
+            cell.entity = player
+
             for block in player.territory:
                 x, y = block
-                self.map[x][y].entity = Entities.CAPTURED
-                self.map[x][y].data = player
+                cell = self[x][y]
+                cell.type = Entities.MY_CAPTURE if me else Entities.CAPTURE
+                cell.entity = player
 
             for block in player.lines:
+                # TODO тут где-то баг
                 x, y = block
-                self.map[x][y].entity = Entities.PLAYER
-                self.map[x][y].data = player
+                cell = self[x][y]
+                cell.type = Entities.MY_LINE if me else Entities.LINE
+                cell.entity = player
 
         for bonus in bonuses:
-            self.map[bonus.x][bonus.y].entity = Entities.BONUS
-            self.map[bonus.x][bonus.y].data = bonus
+            cell = self[bonus.x][bonus.y]
+            cell.type = Entities.BONUS
+            cell.entity = bonus
+
+    def __iter__(self):
+        return iter(self.map)
+
+    def __getitem__(self, item):
+        return self.map[item]
 
     @staticmethod
-    def in_boundary(cell):
-        if cell.x >= 0 < X_CELLS_COUNT and cell.y >= 0 < Y_CELLS_COUNT:
+    def in_boundary(x, y):
+        if 0 <= x < X_CELLS_COUNT and 0 <= y < Y_CELLS_COUNT:
             return True
 
         return False
 
     def get_siblings(self, cell):
-        return [sibling for sibling in get_vert_and_horiz(cell) if self.in_boundary(sibling)]
+        x, y = cell.x, cell.y
 
-    def get_empty_siblings(self, cell):
-        return [sibling for sibling in self.get_siblings(cell) if sibling.entity == Entities.EMPTY]
+        dx = [-1, 1, 0, 0]
+        dy = [0, 0, -1, 1]
 
-    def bfs_paths(self, start, goal):
+        result = []
+        for i in range(4):
+            nx, ny = x + dx[i], y + dy[i]
+            if self.in_boundary(nx, ny):
+                result.append(Cell(nx, ny))
+
+        return result
+
+    def get_without_my_line_and_me_siblings(self, cell):
+        msg([s for s in self.get_siblings(cell) if s.type != Entities.MY_LINE])
+        return [s for s in self.get_siblings(cell) if s.type != Entities.MY_LINE]
+
+    def bfs_paths(self, start, goal, _filter=None):
+        if not _filter:
+            _filter = self.get_without_my_line_and_me_siblings
+
         visited, queue = set(), [[start, []]]
         while queue:
             vertex, path = queue.pop(0)
-            for next in self.get_empty_siblings(vertex):
+            for next in _filter(vertex):
                 if next == goal:
                     return path + [next]
 
