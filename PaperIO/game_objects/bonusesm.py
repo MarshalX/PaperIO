@@ -1,4 +1,4 @@
-from helpersm import get_random_coordinates
+from helpersm import get_random_coordinates, msg
 from constantsm import WIDTH
 
 
@@ -7,7 +7,7 @@ class Bonus:
     visio_name = None
 
     def __init__(self, position):
-        x, y = position
+        x, y = int(position[0] / WIDTH), int(position[1] / WIDTH)
         self.x = x
         self.y = y
 

@@ -1,42 +1,49 @@
+import sys
 import random
 
-from constantsm import WIDTH, X_CELLS_COUNT, Y_CELLS_COUNT
+from constantsm import WIDTH, X_CELLS_COUNT, Y_CELLS_COUNT, DEBUG
+from game_objects.cell import Cell
 
 
-def get_square_coordinates(point, width=WIDTH):
-    x, y = point
+def msg(text):
+    if DEBUG:
+        print(text, file=sys.stderr)
+
+
+def get_square_coordinates(cell, width=1):
+    x, y = cell.x, cell.y
     return (x - width, y - width,
             x + width, y - width,
             x + width, y + width,
             x - width, y + width)
 
 
-def get_diagonals(point, width=WIDTH):
-    x, y = point
+def get_diagonals(cell, width=1):
+    x, y = cell.x, cell.y
 
     return [
-        (x + width, y + width),
-        (x - width, y + width),
-        (x + width, y - width),
-        (x - width, y - width)
+        Cell (x + width, y + width),
+        Cell (x - width, y + width),
+        Cell (x + width, y - width),
+        Cell (x - width, y - width)
     ]
 
 
-def get_vert_and_horiz(point, width=WIDTH):
-    x, y = point
+def get_vert_and_horiz(cell, width=1):
+    x, y = cell.x, cell.y
 
     return [
-        (x, y + width),
-        (x - width, y),
-        (x, y - width),
-        (x + width, y),
+        Cell(x, y + width),
+        Cell(x - width, y),
+        Cell(x, y - width),
+        Cell(x + width, y),
     ]
 
 
-def get_neighboring(point, width=WIDTH):
+def get_neighboring(cell, width=1):
     return [
-        *get_vert_and_horiz(point, width),
-        *get_diagonals(point, width)
+        *get_vert_and_horiz(cell, width),
+        *get_diagonals(cell, width)
     ]
 
 
@@ -60,40 +67,19 @@ def get_territory_line(point, points):
     return line_points, start, end
 
 
-def get_line_coordinates(start, end, width=WIDTH):
-    width = round(width / 2)
-    x1, y1 = start
-    x2, y2 = end
+def get_line_coordinates(start, end, width=1):
+    # тут был round :D
+    x1, y1 = start.x, start.y
+    x2, y2 = end.x, end.y
     return [
-        (x2 + width, y2 + width),
-        (x2 + width, y2 - width),
-        (x1 - width, y1 - width),
-        (x1 - width, y1 + width),
+        Cell(x2 + width, y2 + width),
+        Cell(x2 + width, y2 - width),
+        Cell(x1 - width, y1 - width),
+        Cell(x1 - width, y1 + width),
     ]
 
 
 TERRITORY_CACHE = {}
-
-
-def batch_draw_territory(points, color, redraw, width=WIDTH):
-    if len(points) < 100:
-        return
-
-    if color not in TERRITORY_CACHE or redraw:
-        lines = []
-        excluded = set()
-        for point in points:
-            if point not in excluded:
-                line_points, start, end = get_territory_line(point, points)
-                excluded.update(line_points)
-                coors = get_line_coordinates(start, end, width)
-                lines.append(coors)
-        TERRITORY_CACHE[color] = [len(points), lines]
-    else:
-        lines = TERRITORY_CACHE[color][1]
-
-    # for line in lines:
-    #     for coor in line:
 
 
 def draw_square(point, width=WIDTH):

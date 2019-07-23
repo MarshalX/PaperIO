@@ -1,6 +1,9 @@
 from copy import copy
+
+from game_objects.cell import Cell
 from game_objects.territorym import Territory
-from constantsm import UP, DOWN, LEFT, RIGHT, SPEED, WINDOW_HEIGHT, WINDOW_WIDTH, WIDTH
+from constantsm import UP, DOWN, LEFT, RIGHT, SPEED, WIDTH
+from helpersm import msg
 
 
 class Player:
@@ -9,12 +12,18 @@ class Player:
     def __init__(self, _id, score, direction, territory, lines, position, bonuses):
         self.id = _id
 
-        self.x, self.y = position
+        self.x, self.y = int(position[0] / WIDTH), int(position[1] / WIDTH)
+        self.cell = Cell(self.x, self.y, self)
         self.territory = Territory(territory)
-        self.lines = lines
+        self.lines = [[int(x / WIDTH), int(y / WIDTH)] for x, y in lines]
         self.bonuses = bonuses
         self.score = score
         self.direction = direction
+
+        self.way_queue = []
+
+    def __repr__(self):
+        return f'[Player] ID:{self.id}; Score:{self.score}'
 
     @classmethod
     def de_json(cls, players: dict):
@@ -37,18 +46,28 @@ class Player:
         if command == RIGHT and self.direction != LEFT:
             self.direction = RIGHT
 
-    def move(self):
-        if self.direction == UP:
-            self.y += self.speed
+    def move(self, cell=None):
+        if cell is None and len(self.way_queue):
+            cell = self.way_queue.pop(0)
+        else:
+            return
 
-        if self.direction == DOWN:
-            self.y -= self.speed
+        x, y = cell.x, cell.y
 
-        if self.direction == LEFT:
-            self.x -= self.speed
+        command = None
+        if self.x < x:
+            command = RIGHT
+        if self.x > x:
+            command = LEFT
+        if self.y < y:
+            command = UP
+        if self.y > y:
+            command = DOWN
 
-        if self.direction == RIGHT:
-            self.x += self.speed
+        if command is None:
+            return
+
+        self.change_direction(command)
 
     def get_bonuses_state(self):
         return [{'type': b.visio_name} for b in self.bonuses]
@@ -62,26 +81,3 @@ class Player:
             'position': (self.x, self.y),
             'bonuses': self.get_bonuses_state()
         }
-
-    def _get_line(self, dx, dy):
-        x, y = self.x, self.y
-        points = []
-        while 0 < x < WINDOW_WIDTH and 0 < y < WINDOW_HEIGHT:
-            x += dx
-            y += dy
-            points.append((x, y))
-
-        return points
-
-    def get_direction_line(self):
-        if self.direction == UP:
-            return self._get_line(0, WIDTH)
-
-        if self.direction == DOWN:
-            return self._get_line(0, -WIDTH)
-
-        if self.direction == LEFT:
-            return self._get_line(-WIDTH, 0)
-
-        if self.direction == RIGHT:
-            return self._get_line(WIDTH, 0)

@@ -3,14 +3,12 @@ from constantsm import WIDTH, LEFT, RIGHT, UP, DOWN
 
 
 class Territory:
-    boundary = None
-
     def __init__(self, points):
-        self.points = points
+        self.points = [[int(x / WIDTH), int(y / WIDTH)] for x, y in points]
         self.changed = True
 
-        if self.boundary is None:
-            self.boundary = self.get_boundary()
+    def __iter__(self):
+        return iter(self.points)
 
     def get_boundary(self):
         boundary = []
@@ -39,7 +37,7 @@ class Territory:
             y = max_y
             while y > min_y:
                 if (x, y) not in self.points and in_polygon(x, y, poligon_x_arr, poligon_y_arr):
-                    self.points.add((x, y))
+                    self.points.append([x, y])
                     captured.append((x, y))
                 y -= WIDTH
             x -= WIDTH
@@ -60,15 +58,15 @@ class Territory:
         removed = []
         for point in points:
             if point in self.points:
-                self.points.discard(point)
+                del self.points[point]
                 removed.append(point)
 
         if len(removed) > 0:
             self.changed = True
         return removed
 
-    def get_siblings(self, point):
-        return [sibling for sibling in get_vert_and_horiz(point) if sibling in self.boundary]
+    def get_siblings(self, point, boundary):
+        return [sibling for sibling in get_vert_and_horiz(point) if sibling in boundary]
 
     def split(self, line, direction, player):
         removed = []
@@ -80,7 +78,7 @@ class Territory:
                     if player.x < l_point[0]:
                         if point[0] >= l_point[0]:
                             removed.append(point)
-                            self.points.discard(point)
+                            del self.points[point]
                     else:
                         if point[0] <= l_point[0]:
                             removed.append(point)

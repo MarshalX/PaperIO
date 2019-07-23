@@ -1,9 +1,12 @@
+import json
+
 from helpersm import is_intersect
 from constantsm import WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH, PLAYER_COLORS, MAX_TICK_COUNT, BONUS_CHANCE, \
     BONUSES_MAX_COUNT, X_CELLS_COUNT, Y_CELLS_COUNT, SPEED, NEUTRAL_TERRITORY_SCORE, ENEMY_TERRITORY_SCORE, \
     LINE_KILL_SCORE, SAW_KILL_SCORE, AVAILABLE_BONUSES, SAW_SCORE
 from game_objects.playerm import Player
 from game_objects.bonusesm import Nitro, Slowdown, Bonus, Saw, get_bonus
+from game_objects.map import Map
 
 
 class Game:
@@ -21,7 +24,19 @@ class Game:
 
         self.players = Player.de_json(players)
         self.bonuses = [get_bonus(bonus) for bonus in bonuses]
+        self.map = Map(self.players, self.bonuses)
         self.tick = tick_num
+        self.debug = ''
+
+        for player in self.players:
+            if player.id == 'i':
+                self.player = player
+
+        self.me = self.player
+
+    def end_tick(self):
+        self.me.move()
+        print(json.dumps({"command": self.me.direction, 'debug': self.debug}))
 
     def check_loss(self, player, players):
         is_loss = False
