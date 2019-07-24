@@ -16,7 +16,7 @@ def parse_json(value, default=None):
         return default
 
 
-DEBUG = False
+DEBUG = True
 
 LEFT = 'left'
 RIGHT = 'right'

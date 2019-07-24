@@ -14,31 +14,19 @@ class Map:
                 self.map.append([Cell(i, j) for j in range(X_CELLS_COUNT)])
 
         for player in players:
-            me = player.id == 'i'
-            if me:
+            if player.id == 'i':
                 self.me = player
 
-            x, y = player.x, player.y
-            cell = self[x][y]
-            cell.type = Entities.MY_PLAYER if me else Entities.PLAYER
-            cell.entity = player
+            self[player.x][player.y] = player.cell
 
-            for block in player.territory:
-                x, y = block
-                cell = self[x][y]
-                cell.type = Entities.MY_CAPTURE if me else Entities.CAPTURE
-                cell.entity = player
+            for cell in player.territory:
+                self[cell.x][cell.y] = cell
 
-            for block in player.lines:
-                x, y = block
-                cell = self[x][y]
-                cell.type = Entities.MY_LINE if me else Entities.LINE
-                cell.entity = player
+            for cell in player.lines:
+                self[cell.x][cell.y] = cell
 
         for bonus in bonuses:
-            cell = self[bonus.x][bonus.y]
-            cell.type = Entities.BONUS
-            cell.entity = bonus
+            self[bonus.x][bonus.y] = bonus.cell
 
     def __iter__(self):
         return iter(self.map)

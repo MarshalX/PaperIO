@@ -1,5 +1,4 @@
 import json
-import math
 import random
 
 from game_objects.cell import Entities
@@ -24,12 +23,11 @@ while True:
 
         mx, my = game.me.x, game.me.y
         min_cell, min_dist = None, 10e5
-        for x, y in game.me.territory.points:
-            dist = math.sqrt((x - mx) ** 2 + (y - my) ** 2)
+        for cell in game.me.territory:
+            dist = abs(mx - cell.x) + abs(my - cell.y)
 
             if dist < min_dist:
-                min_dist = dist
-                min_cell = game.map[x][y]
+                min_dist, min_cell = dist, cell
 
         way = game.map.bfs_paths(game.me.cell, min_cell)
 
