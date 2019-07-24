@@ -1,10 +1,11 @@
 from game_objects.cell import Cell, Entities
-from constantsm import Y_CELLS_COUNT, X_CELLS_COUNT
+from constantsm import Y_CELLS_COUNT, X_CELLS_COUNT, RIGHT, LEFT, UP, DOWN
 from helpersm import msg
 
 
 class Map:
     map = None
+    me = None
 
     def __init__(self, players, bonuses):
         if self.map is None:
@@ -14,6 +15,8 @@ class Map:
 
         for player in players:
             me = player.id == 'i'
+            if me:
+                self.me = player
 
             x, y = player.x, player.y
             cell = self[x][y]
@@ -70,16 +73,33 @@ class Map:
         for i in range(4):
             nx, ny = x + dx[i], y + dy[i]
             if self.in_boundary(nx, ny):
-                result.append(self[nx][ny])     # dcp
+                result.append(self[nx][ny])
 
         return result
 
-    def get_without_my_line_and_me_siblings(self, cell):
+    def get_siblings_without_my_line_and_me(self, cell):
         return [s for s in self.get_siblings(cell) if s.type not in [Entities.MY_LINE, Entities.MY_PLAYER]]
+
+    def get_siblings_without_die(self, cell):
+        return [s for s in self.get_siblings_without_my_line_and_me(cell)
+                if s != self.demove(self.me.cell, self.me.direction)]
+
+    def demove(self, cell, direction):
+        x, y = cell.x, cell.y
+        if direction == RIGHT:
+            x -= 1
+        if direction == LEFT:
+            x += 1
+        if direction == UP:
+            y -= 1
+        if direction == DOWN:
+            y += 1
+
+        return self[x][y]
 
     def bfs_paths(self, start, goal, _filter=None):
         if not _filter:
-            _filter = self.get_without_my_line_and_me_siblings
+            _filter = self.get_siblings_without_die
 
         visited, queue = set(), [[start, []]]
         while queue:
