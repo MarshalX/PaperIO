@@ -11,7 +11,7 @@ class Bonus:
         self.cell = Cell(self.x, self.y, self.type, self)
 
     def is_ate(self, player, captured):
-        return (self.x, self.y) == (player.x, player.y) or (self.x, self.y) in captured
+        return (self.x, self.y) == (player.x, player.y) or self.cell in captured
 
     def get_state(self):
         return {'type': self.visio_name, 'cell': self.cell}

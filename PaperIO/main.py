@@ -21,15 +21,7 @@ while True:
         msg('Иду домой')
         to_home = False
 
-        mx, my = game.me.x, game.me.y
-        min_cell, min_dist = None, 10e5
-        for cell in game.me.territory:
-            dist = abs(mx - cell.x) + abs(my - cell.y)
-
-            if dist < min_dist:
-                min_dist, min_cell = dist, cell
-
-        way = game.map.bfs_paths(game.me.cell, min_cell)
+        way = game.map.bfs_paths(game.me.cell, game.me.territory.nearest_cell(game.me.cell))
 
     if not to_home and not way:
         msg('Захватить бы что')
@@ -37,8 +29,8 @@ while True:
         ways = []
 
         x, y = game.me.x, game.me.y
-        for i in range(max(-3, 0 - x), min(3, 30 - x) + 1):
-            for j in range(max(-3, 0 - y), min(3, 30 - y) + 1):
+        for i in range(max(-6, 0 - x), min(6, 30 - x) + 1):
+            for j in range(max(-6, 0 - y), min(6, 30 - y) + 1):
                 if game.map[x + i][y + j].type in [Entities.MY_CAPTURE, Entities.MY_LINE, Entities.MY_PLAYER]:
                     continue
 

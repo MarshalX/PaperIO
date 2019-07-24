@@ -13,10 +13,10 @@ class Entities(Enum):
 
 
 class Cell:
-    def __init__(self, x, y, type=Entities.EMPTY, entity=None):
+    def __init__(self, x, y, _type=Entities.EMPTY, entity=None):
         self.x, self.y = x, y
         self.entity = entity
-        self.type = type
+        self.type = _type
 
     def __repr__(self):
         return f'[Cell] X:{self.x}; Y: {self.y}; Type: {self.type}'

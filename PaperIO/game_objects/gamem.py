@@ -19,24 +19,14 @@ class Game:
 
         for player in self.players:
             if player.id == 'i':
-                self.player = player
-
-        self.me = self.player
+                self.me = player
 
     def end_tick(self):
         msg(f'command: {self.me.direction}')
         print(json.dumps({"command": self.me.direction, 'debug': self.debug}))
 
-    def get_busy_points(self):
-        players_points = {(p.x, p.y) for p in self.players}
-        bonuses_points = {(b.x, b.y) for b in self.bonuses}
-        lines_poins = set()
-        for player in self.players:
-            lines_poins |= {i for i in player.lines}
-
-        return players_points | bonuses_points | lines_poins
-
     def check_loss(self, player, players):
+        # TODO ну ты тут полежи, потом в оценочную добавлю
         is_loss = False
 
         if player.y < 0:

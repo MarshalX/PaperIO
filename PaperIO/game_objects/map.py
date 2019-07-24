@@ -65,12 +65,9 @@ class Map:
 
         return result
 
-    def get_siblings_without_my_line_and_me(self, cell):
-        return [s for s in self.get_siblings(cell) if s.type not in [Entities.MY_LINE, Entities.MY_PLAYER]]
-
-    def get_siblings_without_die(self, cell):
-        return [s for s in self.get_siblings_without_my_line_and_me(cell)
-                if s != self.demove(self.me.cell, self.me.direction)]
+    def get_safe_siblings(self, cell):
+        return [s for s in self.get_siblings(cell) if s != self.demove(self.me.cell, self.me.direction)
+                and s.type not in [Entities.MY_LINE, Entities.MY_PLAYER]]
 
     def demove(self, cell, direction):
         x, y = cell.x, cell.y
@@ -87,7 +84,7 @@ class Map:
 
     def bfs_paths(self, start, goal, _filter=None):
         if not _filter:
-            _filter = self.get_siblings_without_die
+            _filter = self.get_safe_siblings
 
         visited, queue = set(), [[start, []]]
         while queue:

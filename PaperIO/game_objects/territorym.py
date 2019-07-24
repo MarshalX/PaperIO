@@ -11,6 +11,19 @@ class Territory:
     def __iter__(self):
         return iter(self.cells)
 
+    def __len__(self):
+        return len(self.cells)
+
+    def nearest_cell(self, to_cell):
+        min_cell, min_dist = None, 10e5
+        for cell in self:
+            dist = abs(to_cell.x - cell.x) + abs(to_cell.y - cell.y)
+
+            if dist < min_dist:
+                min_dist, min_cell = dist, cell
+
+        return min_cell
+
     def get_boundary(self):
         # TODO переписать
         boundary = []
