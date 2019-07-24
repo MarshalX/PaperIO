@@ -27,7 +27,6 @@ class Map:
                 cell.entity = player
 
             for block in player.lines:
-                # TODO тут где-то баг
                 x, y = block
                 cell = self[x][y]
                 cell.type = Entities.MY_LINE if me else Entities.LINE
@@ -43,6 +42,16 @@ class Map:
 
     def __getitem__(self, item):
         return self.map[item]
+
+    def draw(self):
+        text_map = ''
+        for x in range(X_CELLS_COUNT):
+            row = ''
+            for y in range(Y_CELLS_COUNT):
+                row += self[x][y].type.value
+            text_map += f'{row}\n'
+
+        msg(f'\n {text_map}')
 
     @staticmethod
     def in_boundary(x, y):
@@ -61,13 +70,12 @@ class Map:
         for i in range(4):
             nx, ny = x + dx[i], y + dy[i]
             if self.in_boundary(nx, ny):
-                result.append(Cell(nx, ny))
+                result.append(self[nx][ny])     # dcp
 
         return result
 
     def get_without_my_line_and_me_siblings(self, cell):
-        msg([s for s in self.get_siblings(cell) if s.type != Entities.MY_LINE])
-        return [s for s in self.get_siblings(cell) if s.type != Entities.MY_LINE]
+        return [s for s in self.get_siblings(cell) if s.type not in [Entities.MY_LINE, Entities.MY_PLAYER]]
 
     def bfs_paths(self, start, goal, _filter=None):
         if not _filter:

@@ -2,14 +2,14 @@ from enum import Enum
 
 
 class Entities(Enum):
-    PLAYER = 'p',
-    MY_PLAYER = 'mp',
-    LINE = 'l',
-    MY_LINE = ',l',
-    CAPTURE = 'c'
-    MY_CAPTURE = 'mc'
-    EMPTY = 'e',
-    BONUS = 'b'
+    PLAYER = 'P'
+    MY_PLAYER = 'M'
+    LINE = 'L'
+    MY_LINE = 'S'
+    CAPTURE = 'C'
+    MY_CAPTURE = 'Z'
+    EMPTY = ' '
+    BONUS = 'B'
 
 
 class Cell:

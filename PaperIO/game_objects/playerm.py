@@ -69,6 +69,7 @@ class Player:
         if command is None:
             return
 
+        msg(f'want command: {command}')
         self.change_direction(command)
 
     def get_bonuses_state(self):
