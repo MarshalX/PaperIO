@@ -1,6 +1,5 @@
-from game_objects.cell import Cell, Entities
-from constantsm import Y_CELLS_COUNT, X_CELLS_COUNT, RIGHT, LEFT, UP, DOWN
-from helpersm import msg
+from data.cell import Cell, Entities
+from constants import Y_CELLS_COUNT, X_CELLS_COUNT, RIGHT, LEFT, UP, DOWN
 
 
 class Map:
@@ -17,13 +16,15 @@ class Map:
             if player.id == 'i':
                 self.me = player
 
-            self[player.x][player.y] = player.cell
-
             for cell in player.territory:
                 self[cell.x][cell.y] = cell
 
+        for player in players:
             for cell in player.lines:
                 self[cell.x][cell.y] = cell
+
+        for player in players:
+            self[player.x][player.y] = player.cell
 
         for bonus in bonuses:
             self[bonus.x][bonus.y] = bonus.cell
@@ -34,7 +35,7 @@ class Map:
     def __getitem__(self, item):
         return self.map[item]
 
-    def draw(self):
+    def get_text_map(self):
         text_map = ''
         for x in range(X_CELLS_COUNT):
             row = ''
@@ -42,7 +43,7 @@ class Map:
                 row += self[x][y].type.value
             text_map += f'{row}\n'
 
-        msg(f'\n {text_map}')
+        return text_map
 
     @staticmethod
     def in_boundary(x, y):

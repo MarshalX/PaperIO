@@ -1,10 +1,10 @@
 import json
 
-from helpersm import is_intersect, msg
-from constantsm import X_CELLS_COUNT, Y_CELLS_COUNT
-from game_objects.playerm import Player
-from game_objects.bonusesm import get_bonus
-from game_objects.map import Map
+from helpers import is_intersect, msg
+from constants import X_CELLS_COUNT, Y_CELLS_COUNT, DEBUG
+from data.player import Player
+from data.bonuses import get_bonus
+from data.map import Map
 
 
 class Game:
@@ -23,7 +23,10 @@ class Game:
 
     def end_tick(self):
         msg(f'command: {self.me.direction}')
-        print(json.dumps({"command": self.me.direction, 'debug': self.debug}))
+        if DEBUG:
+            print(json.dumps({"command": self.me.direction, 'rewind': self.me.rewind}))
+        else:
+            print(json.dumps({"command": self.me.direction, 'debug': self.debug}))
 
     def check_loss(self, player, players):
         # TODO ну ты тут полежи, потом в оценочную добавлю

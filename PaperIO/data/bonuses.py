@@ -1,5 +1,5 @@
-from constantsm import WIDTH
-from game_objects.cell import Entities, Cell
+from constants import WIDTH
+from data.cell import Entities, Cell
 
 
 class Bonus:

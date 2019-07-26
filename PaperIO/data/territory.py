@@ -1,11 +1,11 @@
-from game_objects.cell import Cell, Entities
-from helpersm import in_polygon, get_neighboring, get_vert_and_horiz
-from constantsm import WIDTH
+from data.cell import Cell, Entities
+from helpers import in_polygon, get_neighboring, get_vert_and_horiz
+from constants import WIDTH
 
 
 class Territory:
     def __init__(self, points, player):
-        self.cells = [Cell(x // WIDTH, y // WIDTH, Entities.MY_CAPTURE if player.its_me() else Entities.CAPTURE)
+        self.cells = [Cell(x // WIDTH, y // WIDTH, Entities.MY_CAPTURE if player.its_me() else Entities.CAPTURE, player)
                       for x, y in points]
 
     def __iter__(self):

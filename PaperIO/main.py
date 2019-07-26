@@ -1,9 +1,24 @@
 import json
 import random
 
-from game_objects.cell import Entities
-from game_objects.gamem import Game
-from helpersm import msg
+from constants import DEBUG
+from data.cell import Entities
+from data.game import Game
+
+from rewind_сlient import Color
+
+
+class Debug:
+    def __init__(self, player):
+        if DEBUG:
+            from rewind_сlient import RewindClient
+            self.client = RewindClient(player)
+
+    def __getattr__(self, item):
+        if DEBUG:
+            return getattr(self.client, item)
+        return lambda *args: None
+
 
 to_home = False
 way = []
@@ -15,16 +30,16 @@ while True:
         continue
 
     game = Game(data['params'])
-    game.map.draw()
+    debug = Debug(game.me)
 
     if to_home and not way:
-        msg('Иду домой')
+        debug.message('Go to home')
         to_home = False
 
         way = game.map.bfs_paths(game.me.cell, game.me.territory.nearest_cell(game.me.cell))
 
     if not to_home and not way:
-        msg('Захватить бы что')
+        debug.message('Want to capture')
         to_home = True
         ways = []
 
@@ -39,6 +54,7 @@ while True:
         way = random.choice(ways)
 
     if way:
+        debug.circle(way[-1], color=Color.ORANGE)
         to_cell = way.pop(0)
         game.me.move(to_cell)
 

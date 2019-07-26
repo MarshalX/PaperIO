@@ -1,7 +1,7 @@
 import sys
 
-from constantsm import WIDTH, X_CELLS_COUNT, Y_CELLS_COUNT, DEBUG
-from game_objects.cell import Cell
+from constants import WIDTH, X_CELLS_COUNT, Y_CELLS_COUNT, DEBUG
+from data.cell import Cell
 
 
 def msg(text):

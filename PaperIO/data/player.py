@@ -1,9 +1,9 @@
 from copy import copy
 
-from game_objects.cell import Cell, Entities
-from game_objects.territorym import Territory
-from constantsm import UP, DOWN, LEFT, RIGHT, SPEED, WIDTH
-from helpersm import msg
+from data.cell import Cell, Entities
+from data.territory import Territory
+from constants import UP, DOWN, LEFT, RIGHT, SPEED, WIDTH
+from helpers import msg
 
 
 class Player:
@@ -15,11 +15,12 @@ class Player:
         self.x, self.y = position[0] // WIDTH, position[1] // WIDTH
         self.cell = Cell(self.x, self.y, Entities.MY_PLAYER if self.its_me() else Entities.PLAYER, self)
         self.territory = Territory(territory, self)
-        self.lines = [Cell(x // WIDTH, y // WIDTH, Entities.MY_LINE if self.its_me() else Entities.LINE)
+        self.lines = [Cell(x // WIDTH, y // WIDTH, Entities.MY_LINE if self.its_me() else Entities.LINE, self)
                       for x, y in lines]
         self.bonuses = bonuses
         self.score = score
         self.direction = direction
+        self.rewind = []
 
     def __eq__(self, other):
         if not isinstance(other, Player):
