@@ -2,3 +2,5 @@
 local_runner/
 .idea/
 venv/
+miniaicups/
+*.pyc
