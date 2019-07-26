@@ -4,7 +4,7 @@ from constants import WINDOW_HEIGHT, WIDTH
 
 
 class Color(Enum):
-    BLACK = (0, 0, 0, 0),
+    BLACK = (0, 0, 0, 0)
     ORANGE = (255, 128, 0, 255)
 
 

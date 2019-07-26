@@ -1,5 +1,6 @@
 from data.cell import Cell, Entities
-from constants import Y_CELLS_COUNT, X_CELLS_COUNT, RIGHT, LEFT, UP, DOWN
+from constants import Y_CELLS_COUNT, X_CELLS_COUNT, RIGHT, LEFT, UP, DOWN, REVERSED_DIRECTIONS
+from helpers import msg
 
 
 class Map:
@@ -13,7 +14,7 @@ class Map:
                 self.map.append([Cell(i, j) for j in range(X_CELLS_COUNT)])
 
         for player in players:
-            if player.id == 'i':
+            if player.its_me():
                 self.me = player
 
             for cell in player.territory:
@@ -25,6 +26,8 @@ class Map:
 
         for player in players:
             self[player.x][player.y] = player.cell
+
+            player.prev_cell = self.get_points(player.cell, REVERSED_DIRECTIONS[player.direction], single=True)
 
         for bonus in bonuses:
             self[bonus.x][bonus.y] = bonus.cell
@@ -52,11 +55,43 @@ class Map:
 
         return False
 
+    def get_path(self, start, stop):
+        path = [LEFT] * max(0, start.x - stop.x) + [RIGHT] * max(0, stop.x - start.x)
+        path += [DOWN] * max(0, start.y - stop.y) + [UP] * max(0, stop.y - start.y)
+
+        return path
+
+    command_shift = {
+        LEFT: (-1, 0),
+        RIGHT: (1, 0),
+        UP: (0, 1),
+        DOWN: (0, -1)
+    }
+
+    def get_points(self, cell, commands, single=False):
+        if commands is None:
+            return None
+        if not isinstance(commands, list):
+            commands = [commands]
+
+        x, y = cell.x, cell.y
+        result = []
+
+        for command in commands:
+            xs, ys = self.command_shift[command]
+
+            x += xs
+            y += ys
+
+            result.append(self.map[x][y])
+
+        return result[0] if single and result else result
+
     def get_siblings(self, cell):
         x, y = cell.x, cell.y
 
-        dx = [-1, 1, 0, 0]
-        dy = [0, 0, -1, 1]
+        dx = (-1, 1, 0, 0)
+        dy = (0, 0, -1, 1)
 
         result = []
         for i in range(4):
@@ -67,22 +102,11 @@ class Map:
         return result
 
     def get_safe_siblings(self, cell):
-        return [s for s in self.get_siblings(cell) if s != self.demove(self.me.cell, self.me.direction)
+        return [s for s in self.get_siblings(cell)
+                if s != self.get_points(self.me.cell, REVERSED_DIRECTIONS[self.me.direction], single=True)
                 and s.type not in [Entities.MY_LINE, Entities.MY_PLAYER]]
 
-    def demove(self, cell, direction):
-        x, y = cell.x, cell.y
-        if direction == RIGHT:
-            x -= 1
-        if direction == LEFT:
-            x += 1
-        if direction == UP:
-            y -= 1
-        if direction == DOWN:
-            y += 1
-
-        return self[x][y]
-
+    # TODO Переписать
     def bfs_paths(self, start, goal, _filter=None):
         if not _filter:
             _filter = self.get_safe_siblings

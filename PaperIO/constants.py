@@ -16,12 +16,20 @@ def parse_json(value, default=None):
         return default
 
 
-DEBUG = True
-
 LEFT = 'left'
 RIGHT = 'right'
 UP = 'up'
 DOWN = 'down'
+
+REVERSED_DIRECTIONS = {
+    None: None,
+
+    LEFT: RIGHT,
+    RIGHT: LEFT,
+    UP: DOWN,
+    DOWN: UP
+}
+
 
 SPEED = toint(os.getenv('SPEED'), 5)
 WIDTH = toint(os.getenv('WIDTH'), 30)   # должно делиться на 2
@@ -55,3 +63,8 @@ PLAYER_COLORS = [
 
 WINDOW_HEIGHT = Y_CELLS_COUNT * WIDTH
 WINDOW_WIDTH = X_CELLS_COUNT * WIDTH
+
+DEBUG = True
+
+WAYS_PER_ONE_CELL = 1
+MAX_SHAFFLES = 10

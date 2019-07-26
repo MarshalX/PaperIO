@@ -20,6 +20,7 @@ class Player:
         self.bonuses = bonuses
         self.score = score
         self.direction = direction
+        self.prev_cell = self.cell
         self.rewind = []
 
     def __eq__(self, other):
@@ -57,25 +58,6 @@ class Player:
 
         if command == RIGHT and self.direction != LEFT:
             self.direction = RIGHT
-
-    def move(self, cell):
-        x, y = cell.x, cell.y
-
-        command = None
-        if self.x < x:
-            command = RIGHT
-        if self.x > x:
-            command = LEFT
-        if self.y < y:
-            command = UP
-        if self.y > y:
-            command = DOWN
-
-        if command is None:
-            return
-
-        msg(f'want command: {command}')
-        self.change_direction(command)
 
     def get_bonuses_state(self):
         return [{'type': b.visio_name} for b in self.bonuses]
