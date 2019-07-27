@@ -4,49 +4,49 @@ from helpers import msg
 
 
 class Map:
-    map = None
+    map = tuple((tuple(Cell(x, y) for x in range(X_CELLS_COUNT))) for y in range(Y_CELLS_COUNT))
     me = None
 
-    def __init__(self, players, bonuses):
-        if self.map is None:
-            self.map = []
-            for i in range(Y_CELLS_COUNT):
-                self.map.append([Cell(i, j) for j in range(X_CELLS_COUNT)])
+    @staticmethod
+    def get_player_territories(points, player):
+        result = ()
 
-        for player in players:
-            if player.its_me():
-                self.me = player
+        for point in points:
+            Map.map[point[0]][point[1]].type = Entities.MY_CAPTURE if player.its_me() else Entities.CAPTURE
+            Map.map[point[0]][point[1]].entity = player
 
-            for cell in player.territory:
-                self[cell.x][cell.y] = cell
+            result += (Map.map[point[0]][point[1]], )
 
-        for player in players:
-            for cell in player.lines:
-                self[cell.x][cell.y] = cell
+        return result
 
-        for player in players:
-            self[player.x][player.y] = player.cell
+    @staticmethod
+    def get_player_lines(points, player):
+        result = ()
 
-            player.prev_cell = self.get_points(player.cell, REVERSED_DIRECTIONS[player.direction], single=True)
+        for point in points:
+            Map.map[point[0]][point[1]].type = Entities.MY_LINE if player.its_me() else Entities.LINE
+            Map.map[point[0]][point[1]].entity = player
 
-        for bonus in bonuses:
-            self[bonus.x][bonus.y] = bonus.cell
+            result += (Map.map[point[0]][point[1]], )
 
-    def __iter__(self):
-        return iter(self.map)
+        return result
 
-    def __getitem__(self, item):
-        return self.map[item]
+    @staticmethod
+    def get_player_cell(point, player):
+        if player.its_me():
+            Map.me = player
 
-    def get_text_map(self):
-        text_map = ''
-        for x in range(X_CELLS_COUNT):
-            row = ''
-            for y in range(Y_CELLS_COUNT):
-                row += self[x][y].type.value
-            text_map += f'{row}\n'
+        Map.map[point[0]][point[1]].type = Entities.MY_PLAYER if player.its_me() else Entities.PLAYER
+        Map.map[point[0]][point[1]].entity = player
 
-        return text_map
+        return Map.map[point[0]][point[1]]
+
+    @staticmethod
+    def get_bonus_cell(point, bonus):
+        Map.map[point[0]][point[1]].type = Entities.BONUS
+        Map.map[point[0]][point[1]].entity = bonus
+
+        return Map.map[point[0]][point[1]]
 
     @staticmethod
     def in_boundary(x, y):
@@ -55,7 +55,8 @@ class Map:
 
         return False
 
-    def get_path(self, start, stop):
+    @staticmethod
+    def get_path(start, stop):
         path = [LEFT] * max(0, start.x - stop.x) + [RIGHT] * max(0, stop.x - start.x)
         path += [DOWN] * max(0, start.y - stop.y) + [UP] * max(0, stop.y - start.y)
 
@@ -68,7 +69,8 @@ class Map:
         DOWN: (0, -1)
     }
 
-    def get_points(self, cell, commands, single=False):
+    @staticmethod
+    def get_points(cell, commands, single=False):
         if commands is None:
             return None
         if not isinstance(commands, list):
@@ -78,16 +80,17 @@ class Map:
         result = []
 
         for command in commands:
-            xs, ys = self.command_shift[command]
+            xs, ys = Map.command_shift[command]
 
             x += xs
             y += ys
 
-            result.append(self.map[x][y])
+            result.append(Map.map[x][y])
 
         return result[0] if single and result else result
 
-    def get_siblings(self, cell):
+    @staticmethod
+    def get_siblings(cell):
         x, y = cell.x, cell.y
 
         dx = (-1, 1, 0, 0)
@@ -96,20 +99,22 @@ class Map:
         result = []
         for i in range(4):
             nx, ny = x + dx[i], y + dy[i]
-            if self.in_boundary(nx, ny):
-                result.append(self[nx][ny])
+            if Map.in_boundary(nx, ny):
+                result.append(Map.map[nx][ny])
 
         return result
 
-    def get_safe_siblings(self, cell):
-        return [s for s in self.get_siblings(cell)
-                if s != self.get_points(self.me.cell, REVERSED_DIRECTIONS[self.me.direction], single=True)
+    @staticmethod
+    def get_safe_siblings(cell):
+        return [s for s in Map.get_siblings(cell)
+                if s != Map.get_points(Map.me.cell, REVERSED_DIRECTIONS[Map.me.direction], single=True)
                 and s.type not in [Entities.MY_LINE, Entities.MY_PLAYER]]
 
     # TODO Переписать
-    def bfs_paths(self, start, goal, _filter=None):
+    @staticmethod
+    def bfs_paths(start, goal, _filter=None):
         if not _filter:
-            _filter = self.get_safe_siblings
+            _filter = Map.get_safe_siblings
 
         visited, queue = set(), [[start, []]]
         while queue:

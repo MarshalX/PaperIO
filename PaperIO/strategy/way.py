@@ -1,43 +1,42 @@
 from random import shuffle
 
+from data.map import Map
 from strategy.fitness import Fitness
 
 
 class Way:
-    def __init__(self, commands, game):
+    def __init__(self, commands, start_cell=None):
+        self.start_cell = start_cell
         self.commands = commands
-        self.game = game
-        self.path = self.get_path()
-        self.fitness = Fitness(self.path)
+        self.points = self.get_points()
+        self.fitness = Fitness(self.points)
         self._score = None
 
-    def __iter__(self):
-        return iter(self.path)
-
     def __len__(self):
-        return len(self.path)
+        return len(self.commands)
 
     def __str__(self):
-        return f'Way to {self.get_last_path()}; Score: {self.score}; Next cell {self.get_next_path()}'
-
-    def get_path(self):
-        return self.game.map.get_points(self.game.me.cell, self.commands)
+        return f'[FROM] {self.start_cell} [TO] {self.get_last_points()} [Next] {self.get_next_points()} [Score] {self.score}'
 
     def pop(self):
-        return self.commands.pop(0), self.path.pop(0)
+        return self.commands.pop(0), self.points.pop(0)
 
-    def get_next_path(self):
-        return self.path[0] if self.path else None
+    def get_next_points(self):
+        return self.points[0] if self.points else None
 
-    def get_last_path(self):
-        return self.path[-1] if self.path else None
+    def get_last_points(self):
+        return self.points[-1] if self.points else None
 
+    def get_points(self):
+        return Map.get_points(self.start_cell, self.commands)
+
+    @property
     def empty(self):
         return len(self.commands) == 0
 
     def shuffle(self):
         shuffle(self.commands)
-        self.path = self.get_path()
+        self.points = self.get_points()
 
         return self
 

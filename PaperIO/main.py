@@ -1,4 +1,5 @@
-import json, time
+import json
+import time
 
 from constants import DEBUG
 from data.game import Game
@@ -18,6 +19,7 @@ class Debug:
 
 
 manager = Manager()
+times = []
 
 while True:
     start = time.time()
@@ -34,6 +36,8 @@ while True:
     manager.make_move()
 
     end = time.time()
+    times.append(end - start)
     debug.message(f'Time: {end - start}')
+    debug.message(f'Time avg: {sum(times) / len(times)}\n\n')
 
     game.end_tick()

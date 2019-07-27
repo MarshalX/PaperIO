@@ -1,49 +1,71 @@
 from constants import WAYS_PER_ONE_CELL, MAX_SHAFFLES
+from data.map import Map
+from helpers import msg
+from rewind_сlient import Color
+from strategy.move import Move
 from strategy.validations import Validator
 from strategy.way import Way
 
 
 class Manager:
     def __init__(self):
-        self.game = self.me = self.debug = self.current_way = None
+        self.game = self.debug = self.current_move = None
         self.validator = Validator()
 
     def new_tick(self, game, debug):
         self.game = game
-        self.me = self.game.me
         self.debug = debug
 
-    def _get_path_from_me(self, cell):
-        return self.game.map.get_path(self.me.cell, cell)
+    def _generate_moves(self):
+        moves = []
 
-    def _generate_ways(self):
-        ways = []
-
-        for row in self.game.map:
+        for row in Map.map:
             for cell in row:
                 for way_number in range(WAYS_PER_ONE_CELL):
-                    commands = self._get_path_from_me(cell)
+                    from_commands = Map.get_path(cell, Map.me.territory.nearest_cell(cell))
 
-                    way = Way(commands, self.game)
-                    # way.shuffle()
+                    to_commands = Map.get_path(Map.me.cell, cell)
+                    if not to_commands:    # значит я на этой клетке
+                        continue
+
+                    to_way = Way(to_commands, Map.me.cell)
+                    from_way = Way(from_commands, cell)
+
+                    move = Move(to_way, from_way)
+
+                    move.shuffle()
 
                     for _ in range(MAX_SHAFFLES):
-                        if not self.validator.is_valid(way, self.me.prev_cell):
-                            way.shuffle()
+                        if not self.validator.is_valid(move, Map.me.prev_cell):
+                            move.shuffle()
                             continue
 
-                        ways.append(way)
+                        moves.append(move)
 
-        return ways
+        return moves
 
     def make_move(self):
-        ways = self._generate_ways()
-        self.debug.message(f'Generated ways: {len(ways)}')
+        # moves = self._generate_moves()
+        # self.debug.message(f'Generated ways: {len(moves)}')
+        #
+        # if not self.current_move:   # первый тик
+        #     self.current_move = max(moves, key=lambda move: move.score())
+        # if self.current_move and self.current_move.empty:
+        #     self.current_move = max(moves, key=lambda move: move.score())
+        #
 
-        self.current_way = max(ways, key=lambda way: way.score)
+        if not self.current_move:
+            to = Way(Map.get_path(Map.me.cell, Map.map[30][30]), Map.me.cell)
+            from_ = Way(Map.get_path(Map.map[30][30], Map.me.cell), Map.map[30][30])
+            self.current_move = Move(to, from_)
 
-        self.debug.message(f'Im on {self.me.cell}')
-        self.debug.message(f'Best way: {self.current_way}')
+        for cell in self.current_move.to_point.points:
+            self.debug.cell(cell)
 
-        cmd, cell = self.current_way.pop()
-        self.me.change_direction(cmd)
+        for cell in self.current_move.from_point.points:
+            self.debug.cell(cell, color=Color.ORANGE)
+
+        self.debug.message(self.current_move)
+
+        cmd, cell = self.current_move.pop()
+        Map.me.change_direction(cmd)

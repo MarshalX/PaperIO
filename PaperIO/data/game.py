@@ -12,8 +12,8 @@ class Game:
         players, bonuses, tick_num = params['players'], params['bonuses'], params['tick_num']
 
         self.players = Player.de_json(players)
-        self.bonuses = [get_bonus(bonus) for bonus in bonuses]
-        self.map = Map(self.players, self.bonuses)
+        self.bonuses = tuple(get_bonus(bonus) for bonus in bonuses)
+        self.map = Map
         self.tick = tick_num
         self.debug = ''
 

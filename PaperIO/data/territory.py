@@ -1,12 +1,11 @@
-from data.cell import Cell, Entities
+from data.map import Map
 from helpers import in_polygon, get_neighboring, get_vert_and_horiz
 from constants import WIDTH
 
 
 class Territory:
     def __init__(self, points, player):
-        self.cells = [Cell(x // WIDTH, y // WIDTH, Entities.MY_CAPTURE if player.its_me() else Entities.CAPTURE, player)
-                      for x, y in points]
+        self.cells = Map.get_player_territories(tuple([x // WIDTH, y // WIDTH] for x, y in points), player)
 
     def __iter__(self):
         return iter(self.cells)

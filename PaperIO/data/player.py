@@ -1,7 +1,7 @@
 from copy import copy
 
-from data.cell import Cell, Entities
 from data.territory import Territory
+from data.map import Map
 from constants import UP, DOWN, LEFT, RIGHT, SPEED, WIDTH
 from helpers import msg
 
@@ -11,17 +11,16 @@ class Player:
 
     def __init__(self, _id, score, direction, territory, lines, position, bonuses):
         self.id = _id
-
-        self.x, self.y = position[0] // WIDTH, position[1] // WIDTH
-        self.cell = Cell(self.x, self.y, Entities.MY_PLAYER if self.its_me() else Entities.PLAYER, self)
-        self.territory = Territory(territory, self)
-        self.lines = [Cell(x // WIDTH, y // WIDTH, Entities.MY_LINE if self.its_me() else Entities.LINE, self)
-                      for x, y in lines]
         self.bonuses = bonuses
         self.score = score
         self.direction = direction
-        self.prev_cell = self.cell
+        self.prev_cell = None
         self.rewind = []
+
+        self.x, self.y = position[0] // WIDTH, position[1] // WIDTH
+        self.cell = Map.get_player_cell([self.x, self.y], self)
+        self.territory = Territory(territory, self)
+        self.lines = Map.get_player_lines(tuple([x // WIDTH, y // WIDTH] for x, y in lines), self)
 
     def __eq__(self, other):
         if not isinstance(other, Player):
@@ -40,9 +39,9 @@ class Player:
 
     @classmethod
     def de_json(cls, players: dict):
-        players_list = []
+        players_list = ()
         for _id, data in players.items():
-            players_list.append(cls(_id, **data))
+            players_list += (cls(_id, **data), )
 
         return players_list
 
@@ -60,7 +59,7 @@ class Player:
             self.direction = RIGHT
 
     def get_bonuses_state(self):
-        return [{'type': b.visio_name} for b in self.bonuses]
+        return tuple({'type': b.visio_name} for b in self.bonuses)
 
     def get_state(self):
         return {

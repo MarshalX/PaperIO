@@ -8,7 +8,7 @@ class Entities(Enum):
     MY_LINE = 'S'
     CAPTURE = 'C'
     MY_CAPTURE = 'Z'
-    EMPTY = ' '
+    EMPTY = 'E'
     BONUS = 'B'
 
 
@@ -19,7 +19,7 @@ class Cell:
         self.type = _type
 
     def __repr__(self):
-        return f'[Cell] X:{self.x}; Y: {self.y}; Type: {self.type}'
+        return f'{self.x}:{self.y} [T] {self.type.value}'
 
     def __eq__(self, other):
         if not isinstance(other, Cell):

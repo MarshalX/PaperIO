@@ -1,14 +1,13 @@
 from constants import WIDTH
-from data.cell import Entities, Cell
+from data.map import Map
 
 
 class Bonus:
     visio_name = None
-    type = Entities.BONUS
 
     def __init__(self, position):
         self.x, self.y = position[0] // WIDTH, position[1] // WIDTH
-        self.cell = Cell(self.x, self.y, self.type, self)
+        self.cell = Map.get_bonus_cell([self.x, self.y], self)
 
     def is_ate(self, player, captured):
         return (self.x, self.y) == (player.x, player.y) or self.cell in captured
