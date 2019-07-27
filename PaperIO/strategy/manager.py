@@ -47,12 +47,11 @@ class Manager:
     def make_move(self):
         # moves = self._generate_moves()
         # self.debug.message(f'Generated ways: {len(moves)}')
-        #
+
         # if not self.current_move:   # первый тик
         #     self.current_move = max(moves, key=lambda move: move.score())
         # if self.current_move and self.current_move.empty:
         #     self.current_move = max(moves, key=lambda move: move.score())
-        #
 
         if not self.current_move:
             to = Way(Map.get_path(Map.me.cell, Map.map[30][30]), Map.me.cell)

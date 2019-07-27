@@ -85,7 +85,7 @@ class Map:
             x += xs
             y += ys
 
-            result.append(Map.map[x][y])
+            result.append(Map.map[y][x])
 
         return result[0] if single and result else result
 
