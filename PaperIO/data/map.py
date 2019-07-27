@@ -4,7 +4,7 @@ from helpers import msg
 
 
 class Map:
-    map = tuple((tuple(Cell(x, y) for x in range(X_CELLS_COUNT))) for y in range(Y_CELLS_COUNT))
+    map = tuple((tuple(Cell(y, x) for x in range(X_CELLS_COUNT))) for y in range(Y_CELLS_COUNT))
     me = None
 
     @staticmethod
@@ -85,7 +85,7 @@ class Map:
             x += xs
             y += ys
 
-            result.append(Map.map[y][x])
+            result.append(Map.map[x][y])
 
         return result[0] if single and result else result
 
