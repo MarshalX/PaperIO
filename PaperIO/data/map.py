@@ -4,7 +4,7 @@ from helpers import msg
 
 
 class Map:
-    map = tuple((tuple(Cell(y, x) for x in range(X_CELLS_COUNT))) for y in range(Y_CELLS_COUNT))
+    map = tuple((tuple(Cell(x, y) for y in range(Y_CELLS_COUNT))) for x in range(X_CELLS_COUNT))
     me = None
 
     @staticmethod
